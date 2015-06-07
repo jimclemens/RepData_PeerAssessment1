@@ -7,19 +7,49 @@ output:
 
 
 ## Loading and preprocessing the data
-
+```{r echo=TRUE}
+proj_data <- read.csv("./activity.csv")
+head(proj_data)
+```
 
 
 ## What is mean total number of steps taken per day?
-
-
+```{r echo=TRUE}
+daily_steps <- tapply(proj_data$steps, proj_data$date, sum, na.rm = TRUE)
+hist(daily_steps, xlab = "Steps per Day", ylab = "# of Days", main = "Histogram of Steps per Day", breaks = 25)
+#### Display the mean and median number of steps per day:
+mean(daily_steps)
+median(daily_steps)
+```
 
 ## What is the average daily activity pattern?
+#### Create a time series plot of the 5-minute interval and the average number of steps taken, averaged across all days
+```{r echo=TRUE}
+mean_interval_steps <- tapply(proj_data$steps, proj_data$interval, mean, na.rm = TRUE)
+plot(names(mean_interval_steps),
+     mean_interval_steps,  
+     type="l", 
+     xlab = "Time of Day in 5 Min Increments", 
+     ylab = "Steps Taken in Interval")
+```
 
-
+#### The 5-minute interval, on average across all the days in the dataset, that contains the maximum number of steps is:
+```{r echo=TRUE}
+names(which.max(mean_interval_steps))
+```
+and the value is
+```{r echo = TRUE}
+max(mean_interval_steps)
+```
 
 ## Imputing missing values
-
-
+#### First, determine the number of observations (rows) with missing values
+```{r echo = TRUE}
+sum(is.na(proj_data$steps))
+```
+#### Now, replace the missing values with the mean for that period across all days
+```{r echo = TRUE}
+nas <- is.na(proj_data$steps)
+proj_data$steps[nas] <- mean_interval_steps[as.factor(proj_data$interval[nas])]
 
 ## Are there differences in activity patterns between weekdays and weekends?
